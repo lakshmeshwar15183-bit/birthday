@@ -308,3 +308,104 @@ body {
   .memory-grid { gap: 0.5rem; }
   .mem-face { font-size: 1.6rem; }
 }
+
+
+/* ============================================================
+   GAME: Simon Says
+   ============================================================ */
+.simon-board {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  max-width: 340px;
+  margin: 0 auto;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  aspect-ratio: 1;
+}
+.simon-pad {
+  border: none;
+  cursor: pointer;
+  border-radius: 16px;
+  transition: filter 0.15s, transform 0.1s, box-shadow 0.15s;
+  opacity: 0.55;
+}
+.simon-pad[data-pad="0"] { background: #ff4d6d; border-top-left-radius: 100%; }
+.simon-pad[data-pad="1"] { background: #4dd0ff; border-top-right-radius: 100%; }
+.simon-pad[data-pad="2"] { background: #ffd166; border-bottom-left-radius: 100%; }
+.simon-pad[data-pad="3"] { background: #80ed99; border-bottom-right-radius: 100%; }
+.simon-pad:hover { opacity: 0.8; }
+.simon-pad.lit {
+  opacity: 1;
+  filter: brightness(1.6) saturate(1.4);
+  transform: scale(1.05);
+  box-shadow: 0 0 30px 6px rgba(255, 255, 255, 0.5);
+}
+#simon-msg { min-height: 1.4rem; }
+
+/* ============================================================
+   GAME: Whack the Cake
+   ============================================================ */
+.whack-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.whack-hole {
+  aspect-ratio: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.6rem;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+}
+.whack-mole {
+  transform: translateY(120%) scale(0.5);
+  transition: transform 0.18s ease;
+}
+.whack-hole.up .whack-mole { transform: translateY(0) scale(1); }
+.whack-hole.bonk .whack-mole { transform: translateY(0) scale(1.4); opacity: 0; transition: all 0.12s; }
+
+/* ============================================================
+   GAME: Spin the Wheel
+   ============================================================ */
+.wheel-wrap {
+  position: relative;
+  width: 320px;
+  max-width: 90vw;
+  margin: 0 auto;
+}
+#wheel-canvas {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45), 0 0 0 8px rgba(255, 255, 255, 0.15);
+  transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+}
+.wheel-pointer {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.4rem;
+  color: var(--gold);
+  z-index: 5;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+.wheel-result {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.8rem;
+  color: var(--gold);
+  min-height: 2rem;
+}

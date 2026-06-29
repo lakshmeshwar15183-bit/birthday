@@ -33,6 +33,7 @@
       <li><a href="#gallery">Gallery</a></li>
       <li><a href="#games">Games</a></li>
     </ul>
+    <button id="sfx-toggle" class="music-btn" title="Toggle sound effects">🔔</button>
     <button id="music-toggle" class="music-btn" title="Play / pause music">🔇</button>
   </nav>
 
@@ -110,6 +111,9 @@
       <button class="tab-btn active" data-game="balloon">🎈 Balloon Pop</button>
       <button class="tab-btn" data-game="memory">🧠 Memory Match</button>
       <button class="tab-btn" data-game="catch">🎁 Catch the Gifts</button>
+      <button class="tab-btn" data-game="simon">🎵 Simon Says</button>
+      <button class="tab-btn" data-game="whack">🔨 Whack the Cake</button>
+      <button class="tab-btn" data-game="wheel">🎡 Spin the Wheel</button>
     </div>
 
     <!-- Balloon Pop -->
@@ -145,6 +149,46 @@
         <p class="arena-hint">Move your mouse / finger to catch falling gifts 🎁 — avoid the bombs 💣</p>
         <div class="basket" id="basket">🧺</div>
       </div>
+    </div>
+
+    <!-- Simon Says -->
+    <div class="game-panel" id="game-simon">
+      <div class="game-header">
+        <span>Round: <b id="simon-round">0</b></span>
+        <span>Best: <b id="simon-best">0</b></span>
+        <button class="game-start" id="simon-start">Start</button>
+      </div>
+      <p class="section-sub" id="simon-msg">Watch the colors light up, then repeat the sequence! 🎵</p>
+      <div class="simon-board" id="simon-board">
+        <button class="simon-pad" data-pad="0"></button>
+        <button class="simon-pad" data-pad="1"></button>
+        <button class="simon-pad" data-pad="2"></button>
+        <button class="simon-pad" data-pad="3"></button>
+      </div>
+    </div>
+
+    <!-- Whack the Cake -->
+    <div class="game-panel" id="game-whack">
+      <div class="game-header">
+        <span>Score: <b id="whack-score">0</b></span>
+        <span>Time: <b id="whack-time">20</b>s</span>
+        <button class="game-start" id="whack-start">Start</button>
+      </div>
+      <p class="section-sub">Tap the cakes 🎂 as they pop up — but avoid the bombs 💣!</p>
+      <div class="whack-grid" id="whack-grid"></div>
+    </div>
+
+    <!-- Spin the Wheel -->
+    <div class="game-panel" id="game-wheel">
+      <div class="game-header">
+        <button class="game-start" id="wheel-spin">Spin!</button>
+      </div>
+      <p class="section-sub">Give it a spin to reveal a birthday surprise, Shreya! 🎁</p>
+      <div class="wheel-wrap">
+        <div class="wheel-pointer">▼</div>
+        <canvas id="wheel-canvas" width="320" height="320"></canvas>
+      </div>
+      <p class="wheel-result" id="wheel-result"></p>
     </div>
   </section>
 

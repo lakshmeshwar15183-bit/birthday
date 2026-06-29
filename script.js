@@ -17,6 +17,50 @@ function showToast(msg, ms = 2200) {
 }
 
 /* ============================================================
+   SOUND ENGINE (Web Audio API — generated, no files needed)
+   ============================================================ */
+const SFX = {
+  ctx: null,
+  enabled: true,
+  init() {
+    if (!this.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) this.ctx = new AC();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  /* play a single tone */
+  tone(freq, dur = 0.15, type = 'sine', vol = 0.25, delay = 0) {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime + delay;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(vol, t + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(gain).connect(this.ctx.destination);
+    osc.start(t);
+    osc.stop(t + dur + 0.02);
+  },
+  pop()    { this.tone(180 + Math.random() * 120, 0.12, 'triangle', 0.3); },
+  click()  { this.tone(440, 0.07, 'square', 0.12); },
+  match()  { this.tone(660, 0.1, 'sine', 0.25); this.tone(880, 0.12, 'sine', 0.22, 0.1); },
+  error()  { this.tone(160, 0.25, 'sawtooth', 0.2); },
+  catchSfx(){ this.tone(700, 0.08, 'sine', 0.2); this.tone(950, 0.08, 'sine', 0.18, 0.06); },
+  whoosh() { this.tone(300, 0.2, 'sine', 0.15); },
+  win() {
+    [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.18, 'triangle', 0.28, i * 0.12));
+  },
+  fanfare() {
+    [392, 523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.2, 'square', 0.2, i * 0.1));
+  }
+};
+
+/* ============================================================
    CONFETTI ENGINE
    ============================================================ */
 const confettiCanvas = document.getElementById('confetti-canvas');
@@ -86,6 +130,7 @@ function updateConfetti() {
    ============================================================ */
 document.getElementById('celebrate-btn').addEventListener('click', () => {
   spawnConfetti(180);
+  SFX.fanfare();
   showToast('🎉 Hip Hip Hurray for Shreya! 🎉');
   tryPlayMusic();
 });
@@ -95,6 +140,8 @@ cake.addEventListener('click', () => {
   if (!cake.classList.contains('blown')) {
     cake.classList.add('blown');
     spawnConfetti(120);
+    SFX.whoosh();
+    SFX.win();
     showToast('🌬️ Make a wish, Shreya! ✨');
     setTimeout(() => cake.classList.remove('blown'), 4000);
   }
@@ -235,6 +282,7 @@ tabBtns.forEach((btn) => {
     document.querySelectorAll('.game-panel').forEach((p) => p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('game-' + btn.dataset.game).classList.add('active');
+    SFX.click();
   });
 });
 
@@ -299,6 +347,7 @@ function spawnPopBalloon() {
     balloonScoreEl.textContent = balloonScore;
     b.style.transform = 'scale(1.6)';
     b.style.opacity = '0';
+    SFX.pop();
     spawnConfetti(12);
     setTimeout(() => b.remove(), 100);
   });
@@ -311,6 +360,7 @@ function endBalloonGame() {
   balloonArena.innerHTML = `<p class="arena-hint">⏰ Time's up! You popped <b>${balloonScore}</b> balloons!<br/>🎉 Press Start to play again.</p>`;
   balloonStartBtn.textContent = 'Start';
   spawnConfetti(80);
+  SFX.win();
   showToast(`Great job Shreya! Score: ${balloonScore} 🎈`);
 }
 
@@ -364,6 +414,7 @@ function startMemoryGame() {
 function flipMemCard(card) {
   if (memLock || card.classList.contains('flipped') || card.classList.contains('matched')) return;
   card.classList.add('flipped');
+  SFX.click();
 
   if (!memFirst) {
     memFirst = card;
@@ -379,15 +430,18 @@ function flipMemCard(card) {
     memFirst = null;
     memMatches++;
     memoryMatchesEl.textContent = memMatches + '/8';
+    SFX.match();
     spawnConfetti(15);
     if (memMatches === 8) {
       spawnConfetti(160);
+      SFX.fanfare();
       showToast(`🏆 You won in ${memMoves} moves, Shreya!`);
     }
   } else {
     memLock = true;
     const first = memFirst;
     memFirst = null;
+    SFX.error();
     setTimeout(() => {
       first.classList.remove('flipped');
       card.classList.remove('flipped');
@@ -470,10 +524,12 @@ function catchLoop() {
     // caught?
     if (f.y >= basketTop && f.y <= arenaH - 5 && Math.abs(f.x - basketX) < 38) {
       if (f.bomb) {
+        SFX.error();
         loseLife();
       } else {
         catchScore++;
         catchScoreEl.textContent = catchScore;
+        SFX.catchSfx();
         spawnConfetti(8);
       }
       f.el.remove();
@@ -506,11 +562,284 @@ function endCatchGame() {
   hint.className = 'arena-hint';
   hint.innerHTML = `💔 Game Over!<br/>You caught <b>${catchScore}</b> gifts!<br/>🎁 Press Start to try again.`;
   catchArena.appendChild(hint);
+  SFX.win();
   showToast(`Nice catching, Shreya! Score: ${catchScore} 🎁`);
   if (catchScore > 0) spawnConfetti(70);
 }
 
 catchStartBtn.addEventListener('click', startCatchGame);
+
+/* ============================================================
+   SFX TOGGLE
+   ============================================================ */
+const sfxBtn = document.getElementById('sfx-toggle');
+sfxBtn.addEventListener('click', () => {
+  SFX.enabled = !SFX.enabled;
+  if (SFX.enabled) {
+    SFX.init();
+    SFX.match();
+    sfxBtn.textContent = '🔔';
+    showToast('Sound effects ON 🔔');
+  } else {
+    sfxBtn.textContent = '🔕';
+    showToast('Sound effects OFF 🔕');
+  }
+});
+
+/* ============================================================
+   GAME 4 — SIMON SAYS (sound & color memory)
+   ============================================================ */
+const simonPads = Array.from(document.querySelectorAll('.simon-pad'));
+const simonRoundEl = document.getElementById('simon-round');
+const simonBestEl = document.getElementById('simon-best');
+const simonStartBtn = document.getElementById('simon-start');
+const simonMsg = document.getElementById('simon-msg');
+const simonFreqs = [329.6, 440, 554.4, 659.3]; // E4, A4, C#5, E5
+let simonSeq = [];
+let simonInput = [];
+let simonBest = 0;
+let simonAcceptingInput = false;
+
+function lightPad(idx, playSound = true) {
+  const pad = simonPads[idx];
+  pad.classList.add('lit');
+  if (playSound) SFX.tone(simonFreqs[idx], 0.32, 'sine', 0.3);
+  setTimeout(() => pad.classList.remove('lit'), 320);
+}
+
+function playSimonSequence() {
+  simonAcceptingInput = false;
+  simonMsg.textContent = '👀 Watch carefully...';
+  let i = 0;
+  const interval = setInterval(() => {
+    lightPad(simonSeq[i]);
+    i++;
+    if (i >= simonSeq.length) {
+      clearInterval(interval);
+      setTimeout(() => {
+        simonAcceptingInput = true;
+        simonInput = [];
+        simonMsg.textContent = '🎯 Your turn — repeat the sequence!';
+      }, 500);
+    }
+  }, 700);
+}
+
+function nextSimonRound() {
+  simonSeq.push((Math.random() * 4) | 0);
+  simonRoundEl.textContent = simonSeq.length;
+  setTimeout(playSimonSequence, 600);
+}
+
+function startSimon() {
+  SFX.init();
+  simonSeq = [];
+  simonInput = [];
+  simonRoundEl.textContent = '0';
+  simonStartBtn.textContent = 'Restart';
+  simonMsg.textContent = 'Get ready...';
+  nextSimonRound();
+}
+
+simonPads.forEach((pad, idx) => {
+  pad.addEventListener('click', () => {
+    if (!simonAcceptingInput) return;
+    lightPad(idx);
+    simonInput.push(idx);
+    const pos = simonInput.length - 1;
+    if (simonInput[pos] !== simonSeq[pos]) {
+      // wrong
+      simonAcceptingInput = false;
+      SFX.error();
+      simonMsg.textContent = `❌ Oops! You reached round ${simonSeq.length - 1}. Press Restart!`;
+      if (simonSeq.length - 1 > simonBest) {
+        simonBest = simonSeq.length - 1;
+        simonBestEl.textContent = simonBest;
+      }
+      simonStartBtn.textContent = 'Start';
+      return;
+    }
+    if (simonInput.length === simonSeq.length) {
+      // round complete
+      simonAcceptingInput = false;
+      SFX.match();
+      spawnConfetti(20);
+      simonMsg.textContent = '✅ Nice! Next round...';
+      nextSimonRound();
+    }
+  });
+});
+simonStartBtn.addEventListener('click', startSimon);
+
+/* ============================================================
+   GAME 5 — WHACK THE CAKE
+   ============================================================ */
+const whackGrid = document.getElementById('whack-grid');
+const whackScoreEl = document.getElementById('whack-score');
+const whackTimeEl = document.getElementById('whack-time');
+const whackStartBtn = document.getElementById('whack-start');
+let whackScore = 0;
+let whackTime = 20;
+let whackRunning = false;
+let whackPopTimer = null;
+let whackCountdown = null;
+
+// build 9 holes once
+for (let i = 0; i < 9; i++) {
+  const hole = document.createElement('div');
+  hole.className = 'whack-hole';
+  hole.innerHTML = '<span class="whack-mole"></span>';
+  whackGrid.appendChild(hole);
+}
+const whackHoles = Array.from(whackGrid.children);
+
+whackHoles.forEach((hole) => {
+  hole.addEventListener('click', () => {
+    if (!whackRunning || !hole.classList.contains('up') || hole.classList.contains('bonk')) return;
+    const isBomb = hole.dataset.type === 'bomb';
+    hole.classList.add('bonk');
+    if (isBomb) {
+      SFX.error();
+      whackScore = Math.max(0, whackScore - 2);
+      showToast('💥 Bomb! -2');
+    } else {
+      SFX.pop();
+      whackScore++;
+      spawnConfetti(8);
+    }
+    whackScoreEl.textContent = whackScore;
+    setTimeout(() => { hole.classList.remove('up', 'bonk'); }, 120);
+  });
+});
+
+function popMole() {
+  if (!whackRunning) return;
+  const available = whackHoles.filter((h) => !h.classList.contains('up'));
+  if (available.length === 0) return;
+  const hole = available[(Math.random() * available.length) | 0];
+  const isBomb = Math.random() < 0.25;
+  hole.dataset.type = isBomb ? 'bomb' : 'cake';
+  hole.querySelector('.whack-mole').textContent = isBomb ? '💣' : '🎂';
+  hole.classList.add('up');
+  setTimeout(() => hole.classList.remove('up', 'bonk'), 800 + Math.random() * 500);
+}
+
+function startWhack() {
+  clearInterval(whackPopTimer);
+  clearInterval(whackCountdown);
+  whackScore = 0;
+  whackTime = 20;
+  whackScoreEl.textContent = '0';
+  whackTimeEl.textContent = '20';
+  whackRunning = true;
+  whackStartBtn.textContent = 'Restart';
+  SFX.init();
+  whackPopTimer = setInterval(popMole, 650);
+  whackCountdown = setInterval(() => {
+    whackTime--;
+    whackTimeEl.textContent = whackTime;
+    if (whackTime <= 0) endWhack();
+  }, 1000);
+}
+
+function endWhack() {
+  whackRunning = false;
+  clearInterval(whackPopTimer);
+  clearInterval(whackCountdown);
+  whackHoles.forEach((h) => h.classList.remove('up', 'bonk'));
+  whackStartBtn.textContent = 'Start';
+  SFX.win();
+  spawnConfetti(90);
+  showToast(`🎂 Time's up! You scored ${whackScore}, Shreya!`);
+}
+
+whackStartBtn.addEventListener('click', startWhack);
+
+/* ============================================================
+   GAME 6 — SPIN THE WHEEL
+   ============================================================ */
+const wheelCanvas = document.getElementById('wheel-canvas');
+const wheelCtx = wheelCanvas.getContext('2d');
+const wheelSpinBtn = document.getElementById('wheel-spin');
+const wheelResult = document.getElementById('wheel-result');
+const wheelSegments = [
+  { label: '🎁 A Gift!', color: '#ff4d8d' },
+  { label: '🍰 Cake!', color: '#ffd166' },
+  { label: '🤗 A Hug', color: '#8a2be2' },
+  { label: '🎶 A Song', color: '#2575fc' },
+  { label: '⭐ A Wish', color: '#80ed99' },
+  { label: '💖 Love', color: '#ff7b00' },
+  { label: '🎉 Party!', color: '#f72585' },
+  { label: '😘 A Kiss', color: '#4dd0ff' }
+];
+let wheelAngle = 0;
+let wheelSpinning = false;
+
+function drawWheel() {
+  const n = wheelSegments.length;
+  const size = wheelCanvas.width;
+  const r = size / 2;
+  const arc = (Math.PI * 2) / n;
+  wheelCtx.clearRect(0, 0, size, size);
+  for (let i = 0; i < n; i++) {
+    const start = i * arc;
+    wheelCtx.beginPath();
+    wheelCtx.moveTo(r, r);
+    wheelCtx.arc(r, r, r, start, start + arc);
+    wheelCtx.fillStyle = wheelSegments[i].color;
+    wheelCtx.fill();
+    // text
+    wheelCtx.save();
+    wheelCtx.translate(r, r);
+    wheelCtx.rotate(start + arc / 2);
+    wheelCtx.textAlign = 'right';
+    wheelCtx.fillStyle = '#fff';
+    wheelCtx.font = 'bold 15px Poppins, sans-serif';
+    wheelCtx.fillText(wheelSegments[i].label, r - 14, 6);
+    wheelCtx.restore();
+  }
+  // center hub
+  wheelCtx.beginPath();
+  wheelCtx.arc(r, r, 26, 0, Math.PI * 2);
+  wheelCtx.fillStyle = '#fff';
+  wheelCtx.fill();
+  wheelCtx.font = '22px serif';
+  wheelCtx.textAlign = 'center';
+  wheelCtx.fillText('🎂', r, r + 8);
+}
+drawWheel();
+
+function spinWheel() {
+  if (wheelSpinning) return;
+  wheelSpinning = true;
+  wheelResult.textContent = '';
+  SFX.whoosh();
+  const n = wheelSegments.length;
+  const arc = 360 / n;
+  const turns = 4 + Math.random() * 3;
+  const extra = Math.random() * 360;
+  wheelAngle += turns * 360 + extra;
+  wheelCanvas.style.transform = `rotate(${wheelAngle}deg)`;
+
+  // ticking sounds during spin
+  let ticks = 0;
+  const tickTimer = setInterval(() => {
+    SFX.tone(900, 0.04, 'square', 0.08);
+    ticks++;
+    if (ticks > 18) clearInterval(tickTimer);
+  }, 180);
+
+  setTimeout(() => {
+    const normalized = ((wheelAngle % 360) + 360) % 360;
+    // pointer at top (270deg in canvas terms). Segment under pointer:
+    const idx = Math.floor(((360 - normalized + 270) % 360) / arc) % n;
+    wheelResult.textContent = `You won: ${wheelSegments[idx].label}`;
+    SFX.fanfare();
+    spawnConfetti(140);
+    wheelSpinning = false;
+  }, 4100);
+}
+wheelSpinBtn.addEventListener('click', spinWheel);
 
 /* ============================================================
    Welcome confetti + scroll reveal
@@ -519,5 +848,8 @@ window.addEventListener('load', () => {
   setTimeout(() => spawnConfetti(90), 400);
 });
 
-// play music on first user interaction (browser autoplay policy)
-document.body.addEventListener('click', tryPlayMusic, { once: true });
+// play music + init audio on first user interaction (browser autoplay policy)
+document.body.addEventListener('click', () => {
+  SFX.init();
+  tryPlayMusic();
+}, { once: true });
