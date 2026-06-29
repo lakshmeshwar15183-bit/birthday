@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday Shreya! 🎉</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Confetti & balloons canvas layer -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Floating balloons -->
+  <div class="balloons" aria-hidden="true">
+    <span class="balloon b1">🎈</span>
+    <span class="balloon b2">🎈</span>
+    <span class="balloon b3">🎈</span>
+    <span class="balloon b4">🎈</span>
+    <span class="balloon b5">🎈</span>
+    <span class="balloon b6">🎈</span>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-logo">🎂 Shreya</div>
+    <ul class="nav-links">
+      <li><a href="#hero">Home</a></li>
+      <li><a href="#countdown">Countdown</a></li>
+      <li><a href="#wishes">Wishes</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#games">Games</a></li>
+    </ul>
+    <button id="music-toggle" class="music-btn" title="Play / pause music">🔇</button>
+  </nav>
+
+  <!-- HERO -->
+  <header id="hero" class="hero">
+    <div class="hero-content">
+      <p class="hero-pre">🎆 4th of July 🎆</p>
+      <h1 class="hero-title">Happy Birthday</h1>
+      <h2 class="hero-name" id="typed-name">Shreya</h2>
+      <p class="hero-sub">Wishing you a day as bright and beautiful as you are ✨</p>
+      <button class="cta-btn" id="celebrate-btn">🎉 Celebrate! 🎉</button>
+    </div>
+    <div class="cake-wrap">
+      <div class="cake" id="cake" title="Click to blow out the candles!">
+        <div class="cake-plate"></div>
+        <div class="cake-bottom"></div>
+        <div class="cake-middle"></div>
+        <div class="cake-top"></div>
+        <div class="cake-icing"></div>
+        <div class="candle">
+          <div class="flame"></div>
+        </div>
+        <div class="candle c2">
+          <div class="flame"></div>
+        </div>
+        <div class="candle c3">
+          <div class="flame"></div>
+        </div>
+      </div>
+      <p class="cake-hint">👆 Tap the cake to blow the candles</p>
+    </div>
+  </header>
+
+  <!-- COUNTDOWN -->
+  <section id="countdown" class="section countdown-section">
+    <h2 class="section-title">Countdown to the Big Day 🎈</h2>
+    <p class="section-sub" id="countdown-msg">Counting down to Shreya's next birthday...</p>
+    <div class="countdown" id="countdown-timer">
+      <div class="time-box"><span id="days">00</span><small>Days</small></div>
+      <div class="time-box"><span id="hours">00</span><small>Hours</small></div>
+      <div class="time-box"><span id="minutes">00</span><small>Minutes</small></div>
+      <div class="time-box"><span id="seconds">00</span><small>Seconds</small></div>
+    </div>
+  </section>
+
+  <!-- WISHES -->
+  <section id="wishes" class="section wishes-section">
+    <h2 class="section-title">A Special Wish 💖</h2>
+    <div class="wish-card">
+      <p>
+        Dear <strong>Shreya</strong>, on this sparkling 4th of July, may your year ahead
+        be filled with fireworks of joy, sweet surprises, and dreams that come true.
+        You light up every room you walk into — today the world celebrates <em>you</em>! 🎇
+      </p>
+      <p class="wish-sign">With love & lots of cake 🍰</p>
+    </div>
+    <div class="wish-rotator">
+      <p id="rotating-wish">"May all your wishes come true!"</p>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery" class="section gallery-section">
+    <h2 class="section-title">Moments to Cherish 📸</h2>
+    <p class="section-sub">Hover over a card to flip it!</p>
+    <div class="gallery-grid" id="gallery-grid"></div>
+  </section>
+
+  <!-- GAMES -->
+  <section id="games" class="section games-section">
+    <h2 class="section-title">Birthday Mini Games 🎮</h2>
+    <p class="section-sub">Pick a game and have some fun, Shreya!</p>
+
+    <div class="game-tabs">
+      <button class="tab-btn active" data-game="balloon">🎈 Balloon Pop</button>
+      <button class="tab-btn" data-game="memory">🧠 Memory Match</button>
+      <button class="tab-btn" data-game="catch">🎁 Catch the Gifts</button>
+    </div>
+
+    <!-- Balloon Pop -->
+    <div class="game-panel active" id="game-balloon">
+      <div class="game-header">
+        <span>Score: <b id="balloon-score">0</b></span>
+        <span>Time: <b id="balloon-time">30</b>s</span>
+        <button class="game-start" id="balloon-start">Start</button>
+      </div>
+      <div class="game-arena" id="balloon-arena">
+        <p class="arena-hint">Press Start and pop as many balloons as you can! 🎈</p>
+      </div>
+    </div>
+
+    <!-- Memory Match -->
+    <div class="game-panel" id="game-memory">
+      <div class="game-header">
+        <span>Moves: <b id="memory-moves">0</b></span>
+        <span>Matches: <b id="memory-matches">0</b>/8</span>
+        <button class="game-start" id="memory-start">New Game</button>
+      </div>
+      <div class="memory-grid" id="memory-grid"></div>
+    </div>
+
+    <!-- Catch the Gifts -->
+    <div class="game-panel" id="game-catch">
+      <div class="game-header">
+        <span>Score: <b id="catch-score">0</b></span>
+        <span>Lives: <b id="catch-lives">3</b></span>
+        <button class="game-start" id="catch-start">Start</button>
+      </div>
+      <div class="game-arena catch-arena" id="catch-arena">
+        <p class="arena-hint">Move your mouse / finger to catch falling gifts 🎁 — avoid the bombs 💣</p>
+        <div class="basket" id="basket">🧺</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Made with 💖 for <strong>Shreya</strong> · Happy 4th of July Birthday! 🎆</p>
+  </footer>
+
+  <!-- Background music (royalty-free) -->
+  <audio id="bg-music" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8cb749e3a2.mp3?filename=happy-birthday-to-you-piano-version-25341.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
