@@ -1,0 +1,12 @@
+# Netlify configuration for Shreya's Birthday Website
+# This is a static site (plain HTML/CSS/JS) — no build step required.
+
+[build]
+  # No build command needed for a static site
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
